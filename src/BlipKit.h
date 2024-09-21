@@ -41,8 +41,6 @@ extern "C" {
 #include "BKTone.h"
 #include "BKTrack.h"
 #include "BKUnit.h"
-#include "BKWaveFileReader.h"
-#include "BKWaveFileWriter.h"
 
 #ifdef __cplusplus
 }

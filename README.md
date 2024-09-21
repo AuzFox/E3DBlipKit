@@ -1,125 +1,37 @@
-BlipKit
+E3DBlipKit
 =======
 
-[![Build Status](https://github.com/detomon/BlipKit/actions/workflows/c.yml/badge.svg?branch=master)](https://github.com/detomon/BlipKit/actions/workflows/c.yml)
+E3DBlipKit is a slightly modified fork of [BlipKit](https://github.com/detomon/BlipKit/) for use in [ERA-3D](https://github.com/AuzFox/ERA-3D).
 
-BlipKit is a C library for creating the beautiful sound of old sound chips.
-
-- Generate waveforms: square, triangle, noise, sawtooth, sine and custom waveforms
-- Use an unlimited number of individual tracks
-- Use stereo output or up to 8 channels
-- Define instruments to create envelopes and other interesting effects
-- Use effects: portamento, tremolo, vibrato and some more
-- Load multi-channel samples and play them at different pitches
-
-📖 Manual: <http://blipkit.audio>
-
-🎹 Also consider to check out the [bliplay](https://github.com/detomon/bliplay) project
-
-Basic Example
--------------
-
-This code demonstrates the basic steps to generate audio data of a square wave in the note A with enabled tremolo effect:
-
-```c
-// Context object
-BKContext ctx;
-
-// Initialize context with 2 channels (stereo)
-// and a sample rate of 44100 Hz
-BKContextInit (& ctx, 2, 44100);
-
-// Track object to generate the waveform
-BKTrack track;
-
-// Initialize track with square wave
-// By default, the square wave has a duty cycle of 12.5%
-BKTrackInit (& track, BK_SQUARE);
-
-// Set mix and note volume
-BKSetAttr (& track, BK_MASTER_VOLUME, 0.15 * BK_MAX_VOLUME);
-BKSetAttr (& track, BK_VOLUME,        1.0 * BK_MAX_VOLUME);
-
-// Set note A in octave 3
-BKSetAttr (& track, BK_NOTE, BK_A_3 * BK_FINT20_UNIT);
-
-// Enable tremolo effect
-BKInt tremolo [2] = {20, 0.66 * BK_MAX_VOLUME};
-BKTrackSetEffect (& track, BK_EFFECT_TREMOLO, tremolo, sizeof (tremolo));
-
-// Attach track to context
-BKTrackAttach (& track, & ctx);
-
-// Define audio data buffer
-// As there are 2 channels used, the buffer actually must be
-// two times the size than number of frames are requested
-BKFrame frames [512 * 2];
-
-// Generate 512 frames e.g. as they would be requested by an audio output function
-// Subsequent calls to this function generate the next requested number of frames
-BKContextGenerate (& ctx, frames, 512);
-
-// The channels are interlaced into the buffer in the form: LRLR...
-// Which means that the first frame of the left channel is at frames[0],
-// the first frame of the right channel at frames[1] and so on
-```
+Changes include:
+- Removed all files except `src/` and `CMakeLists.txt`
+- Removed usage of POSIX functions to allow for building on Windows
+- Removed `BKWaveFileReader` and `BKWaveFileWriter`
 
 Building the Library
 --------------------
 
-First execute `autogen.sh` in the base directory to generate the build system:
+This library requires [CMake](https://cmake.org/download/) to build.
 
+For building on Windows, it is recommended to use [w64DevKit](https://github.com/skeeto/w64devkit).
+
+From the base directory of this project, run the following commands:
+
+On Linux:
 ```sh
-sh ./autogen.sh
-```
-
-Next execute `configure` in the base directory:
-
-```sh
-./configure
-```
-
-Use the `--without-sdl` option if you don't want to link against SDL.
-
-```sh
-./configure --without-sdl
-```
-
-Then execute `make` to build `libblipkit.a` in the `src` directory:
-
-```sh
+mkdir build && cd build
+cmake ..
 make
 ```
 
-Optionally, you may want to execute to install the library and headers on your system:
-
+On Windows:
 ```sh
-sudo make install
+mkdir build && cd build
+cmake -G "MinGW Makefiles" ..
+make
 ```
 
-Building and Running Examples
------------------------------
-
-All examples use SDL (<http://www.libsdl.org>) to output sound, so you have to install it first. Execute `make examplename` to build an example in the `examples` directory.
-
-```sh
-# in `examples`
-
-make tone
-make divider
-make stereo
-make scratch
-make waveform
-make envelope
-```
-
-Finally, run examples like this:
-
-```sh
-# in `examples`
-
-./tone
-```
+If everything built correctly, you will find `libblipkit.a` in `build/src`.
 
 License
 -------

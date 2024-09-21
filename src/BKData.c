@@ -21,11 +21,8 @@
  * IN THE SOFTWARE.
  */
 
-#include <fcntl.h>
 #include <math.h>
-#include <unistd.h>
 #include "BKData_internal.h"
-#include "BKWaveFileReader.h"
 #include "BKTone.h"
 
 extern BKClass const BKDataClass;
@@ -617,46 +614,6 @@ BKInt BKDataLoadRaw (BKData * data, FILE * file, BKUInt numChannels, BKEnum para
 	free (frames);
 
 	return ret;
-}
-
-BKInt BKDataLoadWAVE (BKData * data, FILE * file)
-{
-	BKWaveFileReader reader;
-	BKInt numChannels, sampleRate, numFrames;
-	BKFrame * frames;
-	BKSize size;
-
-	if (BKWaveFileReaderInit (& reader, file) < 0) {
-		return BK_INVALID_RETURN_VALUE;
-	}
-
-	if (BKWaveFileReaderReadHeader (& reader, & numChannels, & sampleRate, & numFrames) < 0) {
-		return BK_INVALID_RETURN_VALUE;
-	}
-
-	size   = numFrames * numChannels * sizeof (BKFrame);
-	frames = malloc (size);
-
-	if (frames == NULL) {
-		BKDispose (& reader);
-		return BK_ALLOCATION_ERROR;
-	}
-
-	if (BKWaveFileReaderReadFrames (& reader, frames) < 0) {
-		free (frames);
-		return BK_INVALID_RETURN_VALUE;
-	}
-
-	data -> object.flags |= BK_DATA_FLAG_COPY;
-	data -> numBits       = 16;
-	data -> sampleRate    = sampleRate;
-	data -> numFrames     = numFrames;
-	data -> numChannels   = numChannels;
-	data -> frames        = frames;
-
-	BKDispose (& reader);
-
-	return 0;
 }
 
 BKInt BKDataNormalize (BKData * data)

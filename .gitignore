@@ -29,3 +29,4 @@ html
 install_manifest.txt
 Makefile
 Makefile.in
+build/
